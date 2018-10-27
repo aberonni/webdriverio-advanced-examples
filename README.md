@@ -1,82 +1,98 @@
-# webdriverio-advanced-examples
+# WebdriverIO Demo Tests
 [![Build Status](https://travis-ci.org/aberonni/webdriverio-advanced-examples.svg?branch=master)](https://travis-ci.org/aberonni/webdriverio-advanced-examples) [![Greenkeeper badge](https://badges.greenkeeper.io/aberonni/webdriverio-advanced-examples.svg)](https://greenkeeper.io/)
 
-A collection of complicated tests with [webdriver.io](http://webdriver.io/).
+This repository showcases different ways to run tests and various techniques for testing trickier aspects of a website. These examples use [WebdriverIO](http://webdriver.io/), but many of these strategies can be applied with other testing frameworks too.
+
+The different ways in which you can run tests are listed below. To explore what the tests are doing, take a look at the [src/specs](src/specs) folder.
 
 ## Prerequisites
 
 - [node](https://nodejs.org/en/download/)
-- [node-gyp](https://github.com/nodejs/node-gyp#installation)
-- [java](https://java.com/en/download)
+- [yarn](https://yarnpkg.com/en/)
 - [appium](http://appium.io/) (only for appium tests)
+- [docker](https://www.docker.com/) (only for zalenium tests)
 
-## Install dependencies
+#### Install dependencies
 
-```
-yarn
+```bash
+$ yarn
 ```
 
 ## Running tests
 
-### Basic and a11y tests on Chrome, Nexus 5 (emulated with Chrome) and Firefox
+The following is a list of different ways you can run tests.
 
-Runs following tests:
-- check the title of hacker news website
-- load a website and check for accessibility errors with [axe](https://github.com/dequelabs/axe-core)
+> By default you will run all tests, you can run a specific test by adding the `--spec` option. For example: `yarn test --spec src/specs/basic/form.js`
 
-```
-yarn test
-```
+### Local Chrome browser
 
-### Test audio on Chrome
+[More info about chromedriver](https://sites.google.com/a/chromium.org/chromedriver/)
 
-This will open a youtube video and make sure that audio is playing. This is possible thanks to a custom chrome extension that is built on the fly.
+This will use chromedriver to take advantage of your local chrome installation so you can see what the browser is doing while the test runs.
 
-```
-yarn test:audio
+```bash
+$ yarn test
 ```
 
-### Basic tests on XCode Emulated iPhone (appium)
+### Zalenium
 
-These tests use [appium](http://appium.io/) to leverage XCode's emulators
+[More info about zalenium](https://github.com/zalando/zalenium)
 
-To make this work you will also have to install appium.
+You must have docker installed and ready to use in order to run zalenium. Verify your docker installation with the `docker info` command.
 
-```
-yarn global add appium
-yarn test:appium
-```
+Once docker is ready, run the following commands in two separate terminals.
 
-### Visual regression testing on Chrome
-
-This test uses the WebdriverIO [visual regression service](http://webdriver.io/guide/services/visual-regression.html) that allows you to compare screenshots of a website.
-
-```
-yarn test:vrs
+```bash
+$ yarn zalenium
+$ yarn test:zalenium
 ```
 
-If the test fails, you can debug what is happening by looking at the `screenshots/latest` and `screenshots/diff` folders.
+### Browserstack
 
-If you decide that the latest screenshtos should become the baseling, you can update the baseline screenshots that are used for comparison.
+[More info about browserstack](https://automate.browserstack.com)
 
-```
-yarn test:vrs:update
-```
-
-### Checking console logs and video on Chrome
-
-Make sure that the console log is empty using the [`browser.log()`](http://webdriver.io/api/protocol/log.html) function.
-
-Make sure that a video is playing by checking the video's `paused` state.
+You must register for an account on browserstack, and then login to [your dashboard](https://automate.browserstack.com/dashboard) to retrieve username and access key. Add a `.env` file in the root of the project that looks like this:
 
 ```
-yarn test:chrome
+BROWSERSTACK_USERNAME=your_username
+BROWSERSTACK_ACCESS_KEY=your_access_key
 ```
 
-If the test fails, you can debug what is happening by looking at the `screenshots/latest` and `screenshots/diff` folders.
+Afterwards you can run tests on Browserstack
 
-If you decide that the latest screenshtos should become the baseling, you can update the baseline screenshots that are used for comparison.
+```bash
+$ yarn test:browserstack
+```
 
+### Appium - XCode Emulated iPhone
+
+[More info about appium](http://appium.io/)
+
+These tests use appium to leverage XCode's simulators. To make this work you will also have to install appium.
+
+```bash
+$ yarn global add appium
+$ yarn test:appium
 ```
-yarn test:vrs:update
+
+### Debugging tests
+
+You may want to debug tests so you can stop execution and inspect the state of the website.
+
+#### Option 1 - VSCode
+
+If you use VSCode you can debug a test by simply opening a test spec file and pressing `F5`.
+
+#### Option 2 - Chrome debugger
+
+Run
+
+```bash
+$ yarn test:debug
 ```
+
+And then navigate to [chrome://inspect](chrome://inspect) to connect to the debugger.
+
+## :tada: Contributions
+
+Contributions are very welcome! If you have an issue, feedback, enhancement, improvement or anything else, please do open an issue or a PR.

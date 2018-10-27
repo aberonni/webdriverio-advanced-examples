@@ -19,7 +19,10 @@
                 "${relativeFile}"
                 // To run a specific file, you can use:
                 //"--spec", "test/specs/foo.spec.js"
-            ]
+            ],
+            "env": {
+                "VSCODE": "1"
+            }
         }
     ]
 }

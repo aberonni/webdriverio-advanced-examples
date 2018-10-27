@@ -3,11 +3,8 @@ language: node_js
 node_js:
   - "8"
   - "10"
-env:
-  - MOZ_HEADLESS=1
 addons:
   chrome: stable
-  firefox: latest
 cache:
   yarn: true
   directories:
@@ -15,8 +12,3 @@ cache:
 script:
   - yarn lint
   - yarn test
-  # XXX: needs investigation
-  # currently disabled because not working on travis-ci
-  # - yarn test:audio
-  - yarn test:chrome
-  - yarn test:vrs

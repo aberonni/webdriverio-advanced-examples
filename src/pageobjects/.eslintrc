@@ -1,0 +1,11 @@
+{
+    "plugins": [
+        "webdriverio"
+    ],
+    "env": {
+        "webdriverio/wdio": true
+    },
+    "rules": {
+        "class-methods-use-this": "off"
+    }
+}

@@ -3,3 +3,4 @@ node_modules
 errorShots
 screenshots/diff
 screenshots/latest
+.env

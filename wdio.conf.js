@@ -1,32 +1,57 @@
 /* global browser */
 const commandsHelper = require('./src/commands');
-const args = require('./src/chrome.args.js');
+const visualRegression = require('./src/vrsConfiguration');
+const audioDetector = require('./src/audio-detector');
+
+const staticServerPort = 4242;
+const chromeArgs = ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'];
+let specs = ['src/specs/basic/**/*.js', 'src/specs/advanced/**/*.js'];
+let excludedTests = [];
+let extensions = [audioDetector.extension];
+
+if (process.env.CI || process.env.TRAVIS) {
+    chromeArgs.push('--headless');
+    // disabled because not working on Travis CI
+    excludedTests = [
+        // cannot test vrs on travis - different font rendering
+        'src/specs/advanced/vrs.js',
+        // cannot use extensions in headless mode
+        'src/specs/advanced/audio.js',
+    ];
+    // cannot use extensions in headless mode
+    extensions = [];
+}
+
+if (process.env.CONSOLIDATE) {
+    // set when running 'yarn consolidate'
+    // means that we should override default screenshots
+    // so might as well just run this test
+    specs = ['src/specs/advanced/vrs.js'];
+}
 
 exports.config = {
-    specs: ['src/specs/basic/**/*.js', 'src/specs/a11y/**/*.js'],
+    specs,
     capabilities: [
         {
             maxInstances: 1,
             browserName: 'chrome',
-            chromeOptions: { args },
-        },
-        {
-            maxInstances: 1,
-            browserName: 'chrome',
-            chromeOptions: {
-                args,
-                mobileEmulation: {
-                    deviceName: 'Nexus 5',
-                },
+            'goog:chromeOptions': {
+                extensions,
+                args: chromeArgs,
             },
-        },
-        {
-            maxInstances: 1,
-            browserName: 'firefox',
+            exclude: excludedTests,
         },
     ],
     reporters: ['spec'],
-    services: ['selenium-standalone', 'chromedriver'],
+    services: ['static-server', 'visual-regression', 'chromedriver'],
+    staticServerFolders: [{ mount: '/', path: './website' }],
+    staticServerLogs: true,
+    staticServerPort,
+    // vrs options
+    visualRegression,
+    // chromedriver options
+    port: '9515',
+    path: '/',
     /**
      * Gets executed before test execution begins. At this point you can access to all global
      * variables like `browser`. It is the perfect place to define custom commands.
@@ -41,7 +66,7 @@ exports.config = {
     // not including the path portion of your baseUrl.
     // If your `url` parameter starts without a scheme or `/`
     // (like `some/path`), the base url gets prepended directly.
-    baseUrl: 'https://news.ycombinator.com/',
+    baseUrl: `http://localhost:${staticServerPort}/`,
     // Saves a screenshot to a given path if a command fails.
     screenshotPath: './errorShots/',
     // Make sure you have the wdio adapter package for the specific
@@ -51,5 +76,6 @@ exports.config = {
     // See the full list at http://mochajs.org/
     mochaOpts: {
         ui: 'bdd',
+        timeout: 60000,
     },
 };
